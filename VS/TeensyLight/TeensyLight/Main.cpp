@@ -93,9 +93,9 @@ static void _spaceFilter(const std::vector<Vec3b>& input, std::vector<Vec3b>& ou
         float g = 0.0f;
         float r = 0.0f;
         int count = 0;
-        int start = max(i - SPACE_FILTER, 0);
-        int end = min(i + SPACE_FILTER, input.size() - 1);
-        for (int j = start; j <= end; ++j)
+        size_t start = max(i - SPACE_FILTER, 0);
+        size_t end = min(i + SPACE_FILTER, input.size() - 1);
+        for (size_t j = start; j <= end; ++j)
         {
             b += input[j][0];
             g += input[j][1];
@@ -103,7 +103,7 @@ static void _spaceFilter(const std::vector<Vec3b>& input, std::vector<Vec3b>& ou
             ++count;
         }
 
-        output.push_back(Vec3b(b / count, g / count, r / count));
+        output.push_back(Vec3b((uint8_t)(b / count), (uint8_t)(g / count), (uint8_t)(r / count)));
     }
 }
 
@@ -128,6 +128,6 @@ static void _timeFilter(const std::vector<Vec3b>& input, std::vector<Vec3b>& out
             r += hist[j][i][2];
         }
 
-        output.push_back(Vec3b(b / hist.size(), g / hist.size(), r / hist.size()));
+        output.push_back(Vec3b((uint8_t)(b / hist.size()), (uint8_t)(g / hist.size()), (uint8_t)(r / hist.size())));
     }
 }
