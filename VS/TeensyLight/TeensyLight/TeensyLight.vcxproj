@@ -81,12 +81,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ColorConversion.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ScreenVideoCapture.cpp" />
     <ClCompile Include="Serial.cpp" />
     <ClCompile Include="TeensyLightController.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ColorConversion.h" />
     <ClInclude Include="ScreenVideoCapture.h" />
     <ClInclude Include="Serial.h" />
     <ClInclude Include="TeensyLightController.h" />

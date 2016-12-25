@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <stdio.h>
 #include <opencv2/opencv.hpp>
 
 #include "ScreenVideoCapture.h"
@@ -45,17 +44,17 @@ static void _updatePixels(const Mat& frame, TeensyLightController& controller)
     for (int i = frame.rows - 1; i > 0; --i)
     {
         Vec4b color = frame.at<Vec4b>(i, 0);
-        controller.setPixel(index++, color[2], color[1], color[0], 0);
+        controller.setPixel(index++, color[2], color[1], color[0]);
     }
     for (int i = 1; i < frame.cols - 1; ++i)
     {
         Vec4b color = frame.at<Vec4b>(topRow, i);
-        controller.setPixel(index++, color[2], color[1], color[0], 0);
+        controller.setPixel(index++, color[2], color[1], color[0]);
     }
     for (int i = 1; i < frame.rows; ++i)
     {
         Vec4b color = frame.at<Vec4b>(i, frame.cols - 1);
-        controller.setPixel(index++, color[2], color[1], color[0], 0);
+        controller.setPixel(index++, color[2], color[1], color[0]);
     }
 
     controller.show();

@@ -1,4 +1,5 @@
 #include "TeensyLightController.h"
+#include "ColorConversion.h"
 
 #define PACKETLEN       (5)
 #define COBS_OVERHEAD   (1)
@@ -44,14 +45,16 @@ void TeensyLightController::disconnect()
     _serialPort = NULL;
 }
 
-void TeensyLightController::setPixel(uint8_t index, uint8_t red, uint8_t green, uint8_t blue, uint8_t white) const
+void TeensyLightController::setPixel(uint8_t index, uint8_t red, uint8_t green, uint8_t blue) const
 {
+    ColorRGBW color(red, green, blue);
+
     uint8_t packet[PACKETLEN];
     packet[0] = index;
-    packet[1] = green;
-    packet[2] = red;
-    packet[3] = blue;
-    packet[4] = white;
+    packet[1] = color.green;
+    packet[2] = color.red;
+    packet[3] = color.blue;
+    packet[4] = color.white;
 
     uint8_t encodedPacket[PACKETLEN + COBS_OVERHEAD + 1];
     encodedPacket[0] = 0x00; // delimiter
@@ -63,7 +66,7 @@ void TeensyLightController::setPixel(uint8_t index, uint8_t red, uint8_t green, 
 
 void TeensyLightController::show() const
 {
-    setPixel(0xFF, 0x00, 0x00, 0x00, 0x00);
+    setPixel(0xFF, 0, 0, 0);
 }
 
 void TeensyLightController::_cobsEncode(const uint8_t* source, uint32_t size, uint8_t* destination)
