@@ -4,16 +4,20 @@
 #include "ScreenVideoCapture.h"
 #include "TeensyLightController.h"
 
-#define KEY_ESC     (27)
-#define HOR_PIXELS  (36)
-#define VER_PIXELS  (21)
+#define KEY_ESC         (27)
+#define HOR_PIXELS      (36)
+#define VER_PIXELS      (21)
+#define SPACE_FILTER    (3)
+#define TIME_FILTER     (2)
 
 using namespace cv;
 
 static const LPCWSTR comport = L"COM7";
 
-static void _updatePixels(const Mat& frame, TeensyLightController& controller);
+static void _updatePixels(const Mat& frame, std::deque<std::vector<Vec3b> >& pixelHist, TeensyLightController& controller);
 static int _getTopRow(const Mat& frame);
+static void _spaceFilter(const std::vector<Vec3b>& input, std::vector<Vec3b>& output);
+static void _timeFilter(const std::vector<Vec3b>& input, std::vector<Vec3b>& output);
 
 int main(int argc, const char** argv)
 {
@@ -23,40 +27,43 @@ int main(int argc, const char** argv)
     ScreenVideoCapture cap(0);
     Mat frame;
 
+    std::deque<std::vector<Vec3b> > pixelHist;
     while (true)
     {
         cap >> frame;
         if (frame.empty())
-            break;
+            break; 
 
         cvtColor(frame, frame, COLOR_BGRA2BGR);
         resize(frame, frame, Size(HOR_PIXELS, VER_PIXELS), INTER_LINEAR);
-        _updatePixels(frame, controller);
+        _updatePixels(frame, pixelHist, controller);
     }
 
     return 0;
 }
 
-static void _updatePixels(const Mat& frame, TeensyLightController& controller)
+static void _updatePixels(const Mat& frame, std::deque<std::vector<Vec3b> >& pixelHist, TeensyLightController& controller)
 {
     int topRow = _getTopRow(frame);
 
-    uint8_t index = 0;
+    std::vector<Vec3b> pixels;
     for (int i = frame.rows - 1; i > 0; --i)
-    {
-        Vec3b color = frame.at<Vec3b>(i, 0);
-        controller.setPixel(index++, color[2], color[1], color[0]);
-    }
+        pixels.push_back(frame.at<Vec3b>(i, 0));
+
     for (int i = 1; i < frame.cols - 1; ++i)
-    {
-        Vec3b color = frame.at<Vec3b>(topRow, i);
-        controller.setPixel(index++, color[2], color[1], color[0]);
-    }
+        pixels.push_back(frame.at<Vec3b>(topRow, i));
+
     for (int i = 1; i < frame.rows; ++i)
-    {
-        Vec3b color = frame.at<Vec3b>(i, frame.cols - 1);
-        controller.setPixel(index++, color[2], color[1], color[0]);
-    }
+        pixels.push_back(frame.at<Vec3b>(i, frame.cols - 1));
+
+    std::vector<Vec3b> spaceFiltered;
+    _spaceFilter(pixels, spaceFiltered);
+
+    std::vector<Vec3b> timeFiltered;
+    _timeFilter(spaceFiltered, timeFiltered);
+
+    for (int i = 0; i < timeFiltered.size(); ++i)
+        controller.setPixel(i, timeFiltered[i][2], timeFiltered[i][1], timeFiltered[i][0]);
 
     controller.show();
 }
@@ -76,4 +83,51 @@ static int _getTopRow(const Mat& frame)
     }
 
     return 0;
+}
+
+static void _spaceFilter(const std::vector<Vec3b>& input, std::vector<Vec3b>& output)
+{
+    for (int i = 0; i < input.size(); ++i)
+    {
+        float b = 0.0f;
+        float g = 0.0f;
+        float r = 0.0f;
+        int count = 0;
+        int start = max(i - SPACE_FILTER, 0);
+        int end = min(i + SPACE_FILTER, input.size() - 1);
+        for (int j = start; j <= end; ++j)
+        {
+            b += input[j][0];
+            g += input[j][1];
+            r += input[j][2];
+            ++count;
+        }
+
+        output.push_back(Vec3b(b / count, g / count, r / count));
+    }
+}
+
+static void _timeFilter(const std::vector<Vec3b>& input, std::vector<Vec3b>& output)
+{
+    static std::deque<std::vector<Vec3b> > hist;
+
+    hist.push_back(input);
+
+    while (hist.size() > TIME_FILTER * 2 + 1)
+        hist.pop_front();
+
+    for (int i = 0; i < input.size(); ++i)
+    {
+        float b = 0.0f;
+        float g = 0.0f;
+        float r = 0.0f;
+        for (int j = 0; j < hist.size(); ++j)
+        {
+            b += hist[j][i][0];
+            g += hist[j][i][1];
+            r += hist[j][i][2];
+        }
+
+        output.push_back(Vec3b(b / hist.size(), g / hist.size(), r / hist.size()));
+    }
 }
