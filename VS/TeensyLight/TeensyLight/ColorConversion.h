@@ -2,8 +2,10 @@
 
 #include <stdint.h>
 
-struct ColorRGBW
+class ColorRGBW
 {
+    static const uint8_t _gamma[256];
+
 public:
     uint8_t red;
     uint8_t green;
