@@ -63,11 +63,17 @@ static void _updatePixels(const Mat& frame, TeensyLightController& controller)
 
 static int _getTopRow(const Mat& frame)
 {
-    int blackCount = 0;
-    for (int i = 0; i < frame.cols; ++i)
-        for (int c = 0; c < 3; ++c)
-            if (frame.at<Vec3b>(0, i)[c] == 0)
-                ++blackCount;
+    for (int topRow = 0; topRow < 10; ++topRow)
+    {
+        int blackCount = 0;
+        for (int i = 0; i < frame.cols; ++i)
+            for (int c = 0; c < 3; ++c)
+                if (frame.at<Vec3b>(topRow, i)[c] <= 30)
+                    ++blackCount;
 
-    return (blackCount > 5 * 3) ? 1 : 0;
+        if (blackCount < 20 * 3)
+            return topRow;
+    }
+
+    return 0;
 }
