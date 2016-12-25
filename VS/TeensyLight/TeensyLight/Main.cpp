@@ -6,10 +6,11 @@
 #include "ScreenVideoCapture.h"
 #include "TeensyLightController.h"
 
-#define HOR_PIXELS      (36)
-#define VER_PIXELS      (21)
-#define SPACE_FILTER    (3)
-#define TIME_FILTER     (2)
+#define CONNECT_INTERVAL    (500)
+#define HOR_PIXELS          (36)
+#define VER_PIXELS          (21)
+#define SPACE_FILTER        (3)
+#define TIME_FILTER         (2)
 
 #define COMPORT         (L"COM7")
 #define CAP_DEVICE      (0)
@@ -27,14 +28,11 @@ int main(int argc, const char** argv)
     ScreenVideoCapture cap(CAP_DEVICE);
     Mat frame;
 
+    int64_t lastConnectAttempt = 0;
     std::deque<std::vector<Vec3b> > pixelHist;
     while (true)
     {
-        if (!controller.isConnected())
-        {
-            controller.connect(COMPORT);
-        }
-        else
+        if (controller.isConnected())
         {
             cap >> frame;
             if (frame.empty())
@@ -43,6 +41,11 @@ int main(int argc, const char** argv)
             cvtColor(frame, frame, COLOR_BGRA2BGR);
             resize(frame, frame, Size(HOR_PIXELS, VER_PIXELS), INTER_LINEAR);
             _updatePixels(frame, pixelHist, controller);
+        }
+        else if (getTickCount() - lastConnectAttempt > CONNECT_INTERVAL)
+        {
+            controller.connect(COMPORT);
+            lastConnectAttempt = getTickCount();
         }
     }
 
