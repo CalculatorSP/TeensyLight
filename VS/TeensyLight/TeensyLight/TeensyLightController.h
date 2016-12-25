@@ -16,6 +16,6 @@ public:
     bool connect(const LPCWSTR comport);
     void disconnect();
     bool isConnected() const;
-    void setPixel(uint8_t index, uint8_t red, uint8_t green, uint8_t blue) const;
-    void show() const;
+    void setPixel(uint8_t index, uint8_t red, uint8_t green, uint8_t blue);
+    void show();
 };

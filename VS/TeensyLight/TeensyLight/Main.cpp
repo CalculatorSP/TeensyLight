@@ -4,15 +4,15 @@
 #include "ScreenVideoCapture.h"
 #include "TeensyLightController.h"
 
-#define KEY_ESC         (27)
 #define HOR_PIXELS      (36)
 #define VER_PIXELS      (21)
 #define SPACE_FILTER    (3)
 #define TIME_FILTER     (2)
 
-using namespace cv;
+#define COMPORT         (L"COM7")
+#define CAP_DEVICE      (0)
 
-static const LPCWSTR comport = L"COM7";
+using namespace cv;
 
 static void _updatePixels(const Mat& frame, std::deque<std::vector<Vec3b> >& pixelHist, TeensyLightController& controller);
 static int _getTopRow(const Mat& frame);
@@ -22,14 +22,15 @@ static void _timeFilter(const std::vector<Vec3b>& input, std::vector<Vec3b>& out
 int main(int argc, const char** argv)
 {
     TeensyLightController controller;
-    controller.connect(comport);
-
-    ScreenVideoCapture cap(0);
+    ScreenVideoCapture cap(CAP_DEVICE);
     Mat frame;
 
     std::deque<std::vector<Vec3b> > pixelHist;
     while (true)
     {
+        if (!controller.isConnected())
+            controller.connect(COMPORT);
+
         cap >> frame;
         if (frame.empty())
             break; 

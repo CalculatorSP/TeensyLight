@@ -45,7 +45,7 @@ void TeensyLightController::disconnect()
     _serialPort = NULL;
 }
 
-void TeensyLightController::setPixel(uint8_t index, uint8_t red, uint8_t green, uint8_t blue) const
+void TeensyLightController::setPixel(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
 {
     ColorRGBW color(red, green, blue);
 
@@ -61,10 +61,11 @@ void TeensyLightController::setPixel(uint8_t index, uint8_t red, uint8_t green, 
     _cobsEncode(packet, sizeof(packet), &encodedPacket[1]);
 
     if (isConnected())
-        _serialPort->write(encodedPacket, sizeof(encodedPacket));
+        if (_serialPort->write(encodedPacket, sizeof(encodedPacket)) != sizeof(encodedPacket))
+            disconnect();
 }
 
-void TeensyLightController::show() const
+void TeensyLightController::show()
 {
     setPixel(0xFF, 0, 0, 0);
 }
