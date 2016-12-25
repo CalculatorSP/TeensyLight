@@ -83,9 +83,13 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ScreenVideoCapture.cpp" />
+    <ClCompile Include="Serial.cpp" />
+    <ClCompile Include="TeensyLightController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ScreenVideoCapture.h" />
+    <ClInclude Include="Serial.h" />
+    <ClInclude Include="TeensyLightController.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

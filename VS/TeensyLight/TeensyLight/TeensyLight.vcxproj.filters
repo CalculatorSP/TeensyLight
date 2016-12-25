@@ -21,9 +21,21 @@
     <ClCompile Include="ScreenVideoCapture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TeensyLightController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Serial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ScreenVideoCapture.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TeensyLightController.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serial.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
