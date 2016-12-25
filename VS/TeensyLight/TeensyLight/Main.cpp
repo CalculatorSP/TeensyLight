@@ -31,15 +31,19 @@ int main(int argc, const char** argv)
     while (true)
     {
         if (!controller.isConnected())
+        {
             controller.connect(COMPORT);
+        }
+        else
+        {
+            cap >> frame;
+            if (frame.empty())
+                break;
 
-        cap >> frame;
-        if (frame.empty())
-            break; 
-
-        cvtColor(frame, frame, COLOR_BGRA2BGR);
-        resize(frame, frame, Size(HOR_PIXELS, VER_PIXELS), INTER_LINEAR);
-        _updatePixels(frame, pixelHist, controller);
+            cvtColor(frame, frame, COLOR_BGRA2BGR);
+            resize(frame, frame, Size(HOR_PIXELS, VER_PIXELS), INTER_LINEAR);
+            _updatePixels(frame, pixelHist, controller);
+        }
     }
 
     return 0;
@@ -115,7 +119,6 @@ static void _timeFilter(const std::vector<Vec3b>& input, std::vector<Vec3b>& out
     static std::deque<std::vector<Vec3b> > hist;
 
     hist.push_back(input);
-
     while (hist.size() > TIME_FILTER * 2 + 1)
         hist.pop_front();
 
