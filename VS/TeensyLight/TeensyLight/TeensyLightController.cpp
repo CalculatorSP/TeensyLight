@@ -61,10 +61,15 @@ void TeensyLightController::setPixel(uint8_t index, uint8_t red, uint8_t green, 
         _serialPort->write(encodedPacket, sizeof(encodedPacket));
 }
 
+void TeensyLightController::show() const
+{
+    setPixel(0xFF, 0x00, 0x00, 0x00, 0x00);
+}
+
 void TeensyLightController::_cobsEncode(const uint8_t* source, uint32_t size, uint8_t* destination)
 {
     uint32_t read_index = 0;
-    uint32_t write_index = 0;
+    uint32_t write_index = 1;
     uint32_t code_index = 0;
     uint8_t code = 1;
 
