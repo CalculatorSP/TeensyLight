@@ -1,7 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 
 #define PIN            (17)
-#define NUMPIXELS      (256)
+#define NUMPIXELS      (92)
 #define PACKETSIZE     (5)
 #define COBS_OVERHEAD  (1)
 
@@ -12,7 +12,7 @@ void setup()
   pixels.begin();
   pixels.clear();
   pixels.show();
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
 void loop()
@@ -25,13 +25,15 @@ void loop()
   for (uint8_t i = 0; i < sizeof(encodedPacket); ++i)
     encodedPacket[i] = waitForByte();
 
-  // Decode packet
+  // Decode packet and set pixel
   uint8_t decodedPacket[PACKETSIZE];
-  cobs_decode(encodedPacket, sizeof(encodedPacket), decodedPacket);
-
-  // Set pixel value
-  pixels.setPixelColor(decodedPacket[0], Adafruit_NeoPixel::Color(decodedPacket[1], decodedPacket[2], decodedPacket[3], decodedPacket[4]));
-  pixels.show();
+  if (cobs_decode(encodedPacket, sizeof(encodedPacket), decodedPacket))
+  {
+    if (decodedPacket[0] < NUMPIXELS)
+      pixels.setPixelColor(decodedPacket[0], Adafruit_NeoPixel::Color(decodedPacket[1], decodedPacket[2], decodedPacket[3], decodedPacket[4]));
+    else
+      pixels.show();
+  }
 }
 
 uint8_t waitForByte()
