@@ -7,8 +7,8 @@
 #include "TeensyLightController.h"
 
 #define CONNECT_INTERVAL    (500)
-#define HOR_PIXELS          (36)
-#define VER_PIXELS          (21)
+#define HOR_PIXELS          (38)
+#define VER_PIXELS          (22)
 #define SPACE_FILTER        (3)
 #define TIME_FILTER         (2)
 
